@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Visualização de Dados Escolares</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <h1>Gráficos das Escolas</h1>
+</header>
+
+<div class="container">
+
+  <div class="grafico">
+    <h2>Distribuição por dependência administrativa</h2>
+    <img src="{{ url_for('static', filename='output/dependencia.png') }}" alt="Distribuição por dependência">
+  </div>
+
+  <div class="grafico">
+    <h2>Quantidade de escolas por estado</h2>
+    <img src="{{ url_for('static', filename='output/escolas_por_estado.png') }}" alt="Escolas por estado">
+  </div>
+
+  <div class="grafico">
+    <h2>Situação de funcionamento das escolas</h2>
+    <img src="{{ url_for('static', filename='output/situacao_funcionamento.png') }}" alt="Situação de funcionamento das escolas">
+  </div>
+
+  <div class="grafico">
+    <h2>Ensino profissionalizante</h2>
+    <img src="{{ url_for('static', filename='output/ensino_profissionalizante.png') }}" alt="Ensino profissionalizante">
+  </div>
+
+  <div class="grafico">
+    <h2>Top 10 municípios com mais escolas</h2>
+    <img src="{{ url_for('static', filename='output/top_municipios.png') }}" alt="Top 10 municípios">
+  </div>
+
+  <div class="grafico">
+    <h2>Escolas por tipo de dependência</h2>
+    <img src="{{ url_for('static', filename='output/dependencia_barplot.png') }}" alt="Tipo de dependência">
+  </div>
+
+  <div class="grafico">
+    <h2>Escolas profissionais por estado</h2>
+    <img src="{{ url_for('static', filename='output/escolas_profissionais_por_estado.png') }}" alt="Profissionais por estado">
+  </div>
+
+  <div class="grafico">
+    <h2>Estados com mais ensino profissionalizante</h2>
+    <img src="{{ url_for('static', filename='output/mais_profissionalizantes.png') }}" alt="Estados com mais profissionalizante">
+  </div>
+
+</div>
+
+<footer>
+</footer>
+
+</body>
+</html>

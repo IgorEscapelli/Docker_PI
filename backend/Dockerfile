@@ -2,9 +2,14 @@ FROM python:3.10
 
 WORKDIR /app
 
-COPY . .
+# Copia só o requirements primeiro (melhora cache)
+COPY requirements.txt .
 
-RUN pip install flask pandas matplotlib seaborn
+# Instala dependências
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Agora copia o restante da aplicação
+COPY . .
 
 EXPOSE 5000
 

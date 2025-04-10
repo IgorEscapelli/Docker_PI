@@ -1,6 +1,4 @@
-flask
-mysql-connector-python
 pandas
 matplotlib
 seaborn
-
+flask
