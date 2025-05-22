@@ -2,13 +2,13 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_USER = 'superlike1'
+        DOCKER_HUB_USER = 'igorescapelli'
         IMAGE_FRONTEND = "${DOCKER_HUB_USER}/frontend-app"
         IMAGE_BACKEND  = "${DOCKER_HUB_USER}/backend-app"
         IMAGE_GERADOR  = "${DOCKER_HUB_USER}/gerador-app"
         IMAGE_MYSQL    = "${DOCKER_HUB_USER}/mysql-app"
         IMAGE_RSCRIPT  = "${DOCKER_HUB_USER}/rscript-app"
-        IMAGE_FLASKAPI = "${DOCKER_HUB_USER}/flask-app"
+        IMAGE_FLASKAPI = "${DOCKER_HUB_USER}/flask-api"
     }
 
     stages {
@@ -28,10 +28,10 @@ pipeline {
         stage('Subir DB e Executar Gerador para criar CSV') {
             steps {
                 script {
-                    echo "Criando diretório backend no workspace e ajustando permissões..."
+                    echo "Criando diretório backend/data e ajustando permissões..."
                     sh """
-                        mkdir -p "${env.WORKSPACE}/backend"
-                        chmod 777 "${env.WORKSPACE}/backend"
+                        mkdir -p "${env.WORKSPACE}/backend/data"
+                        chmod 777 "${env.WORKSPACE}/backend/data"
                     """
 
                     echo "Subindo banco de dados MySQL..."
@@ -40,12 +40,12 @@ pipeline {
                     echo "Aguardando banco de dados ficar pronto..."
                     sh 'sleep 15'
 
-                    echo "Executando container gerador para criar arquivo CSV..."
+                    echo "Executando container gerador para gerar o arquivo CSV..."
                     sh 'docker-compose run --rm gerador'
 
                     echo "Verificando se arquivo alunos_com_erros.csv foi criado..."
                     sh """
-                        if [ -f "${env.WORKSPACE}/backend/alunos_com_erros.csv" ]; then
+                        if [ -f "${env.WORKSPACE}/backend/data/alunos_com_erros.csv" ]; then
                             echo "Arquivo alunos_com_erros.csv encontrado."
                         else
                             echo "Arquivo alunos_com_erros.csv NÃO encontrado! Abortando pipeline."
@@ -68,7 +68,7 @@ pipeline {
         stage('Executar Script R com Volume') {
             steps {
                 script {
-                    echo "Executando o script R dentro do contêiner, com volume mapeado para dados..."
+                    echo "Executando script R com volume mapeado..."
                     sh """
                         docker run --rm \
                             -v "${env.WORKSPACE}/rscript:/app/rscript" \
@@ -77,7 +77,7 @@ pipeline {
                             Rscript /app/rscript/limpeza.r
                     """
 
-                    echo "Verificando se arquivo alunos_corrigido.csv foi gerado..."
+                    echo "Verificando se alunos_corrigido.csv foi gerado..."
                     sh """
                         if [ -f "${env.WORKSPACE}/backend/data/alunos_corrigido.csv" ]; then
                             echo "Arquivo alunos_corrigido.csv gerado com sucesso!"
@@ -116,10 +116,10 @@ pipeline {
         stage('Deploy com Docker Compose') {
             steps {
                 script {
-                    echo "Finalizando e removendo containers antigos..."
+                    echo "Parando containers antigos..."
                     sh 'docker-compose down --remove-orphans'
 
-                    echo "Subindo containers atualizados em background..."
+                    echo "Subindo novos containers..."
                     sh 'docker-compose up -d --force-recreate'
                 }
             }
@@ -158,7 +158,7 @@ pipeline {
             }
         }
 
-        stage('Start Stack') {
+        stage('Start Stack Final') {
             steps {
                 sh 'docker-compose up -d'
             }
@@ -167,12 +167,12 @@ pipeline {
 
     post {
         always {
-            echo "Limpeza pós-build..."
+            echo "Limpando recursos..."
             sh """
                 docker system prune -f || true
-                rm -f "${env.WORKSPACE}/backend/alunos_com_erros.csv" || true
+                rm -f "${env.WORKSPACE}/backend/data/alunos_com_erros.csv" || true
+                rm -f "${env.WORKSPACE}/backend/data/alunos_corrigido.csv" || true
             """
         }
     }
 }
-// Fim do pipeline
