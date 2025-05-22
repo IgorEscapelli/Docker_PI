@@ -1,0 +1,11 @@
+FROM mysql:8.0
+
+# Copia o arquivo .sql para dentro do container
+COPY ./pi.sql /docker-entrypoint-initdb.d/pi.sql
+
+# (Opcional) Defina a senha do root (se necessário)
+ENV MYSQL_ROOT_PASSWORD=walker1207
+
+# As imagens do MySQL têm um mecanismo de inicialização que automaticamente executa os scripts dentro do diretório /docker-entrypoint-initdb.d/ durante a primeira inicialização do container.
+
+# A imagem do MySQL já executa automaticamente qualquer script SQL no diretório /docker-entrypoint-initdb.d/.
